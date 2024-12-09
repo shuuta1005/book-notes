@@ -32,6 +32,21 @@ app.get("/login", (req, res) => {
 app.get("/register", (req, res) => {
   res.render("register.ejs");
 });
+//Define book list route
+app.get("/books", async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    const result = await db.query("SELECT * FROM books WHERE user_id = $1", [
+      userId,
+    ]);
+    const books = result.rows;
+    res.render("bookList.ejs", { books });
+  } catch (err) {
+    console.log(err);
+    res.send("Error fetching book list");
+  }
+});
 
 //Post Routes
 
@@ -54,7 +69,7 @@ app.post("/register", async (req, res) => {
         [username, password]
       );
       console.log(result);
-      res.render("home.ejs");
+      res.render("bookList.ejs");
     }
   } catch (err) {
     console.log(err);
@@ -78,7 +93,7 @@ app.post("/login", async (req, res) => {
       const user = result.rows[0];
       const storedPassword = user.password;
       if (password === storedPassword) {
-        res.render("home.ejs");
+        res.render("bookList.ejs");
       } else {
         res.send("Wrong password");
       }
