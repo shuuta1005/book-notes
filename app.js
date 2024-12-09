@@ -1,9 +1,11 @@
 import express from "express";
 import bodyParser from "body-parser";
 import pg from "pg";
+import bcrypt from "bcrypt";
 
 const app = express();
 const port = 3000;
+const saltRounds = 5;
 
 const db = new pg.Client({
   user: "postgres",
@@ -52,24 +54,32 @@ app.get("/books", async (req, res) => {
 
 //Define register post
 app.post("/register", async (req, res) => {
-  const username = req.body.username;
+  const email = req.body.username;
   const password = req.body.password;
 
   try {
     const checkIfExist = await db.query(
       "SELECT * FROM users WHERE email = $1",
-      [username]
+      [email]
     );
 
     if (checkIfExist.rows.length > 0) {
       res.send("Email already exists. Try logging in.");
     } else {
-      const result = await db.query(
-        "INSERT INTO users (email, password) VALUES ($1, $2)",
-        [username, password]
-      );
-      console.log(result);
-      res.render("bookList.ejs");
+      //Password hashing
+      bcrypt.hash(password, saltRounds, async (err, hash) => {
+        if (err) {
+          console.log(err);
+          res.send("Error hasing password");
+        } else {
+          const result = await db.query(
+            "INSERT INTO users (email, password) VALUES ($1, $2)",
+            [email, hash]
+          );
+          console.log(result);
+          res.render("home.ejs");
+        }
+      });
     }
   } catch (err) {
     console.log(err);
@@ -78,25 +88,31 @@ app.post("/register", async (req, res) => {
 
 //Define login post
 app.post("/login", async (req, res) => {
-  const username = req.body.username;
-  const password = req.body.password;
-  console.log(username);
-  console.log(password);
+  const email = req.body.username;
+  const loginPassword = req.body.password;
 
   try {
     const result = await db.query(
       "SELECT password from users WHERE email = $1",
-      [username]
+      [email]
     );
 
     if (result.rows.length > 0) {
       const user = result.rows[0];
-      const storedPassword = user.password;
-      if (password === storedPassword) {
-        res.render("bookList.ejs");
-      } else {
-        res.send("Wrong password");
-      }
+      const storedHashedPassword = user.password;
+
+      bcrypt.compare(loginPassword, storedHashedPassword, (err, result) => {
+        if (err) {
+          console.log(err);
+          res.send("Error compareing password");
+        } else {
+          if (result) {
+            res.render("home.ejs");
+          } else {
+            res.send("Incorrect password");
+          }
+        }
+      });
     } else {
       res.send("User not found with the email");
     }
