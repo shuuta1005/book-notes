@@ -36,8 +36,6 @@ app.get("/register", (req, res) => {
 });
 //Define book list route
 app.get("/books", async (req, res) => {
-  const userId = req.user.id;
-
   try {
     const result = await db.query("SELECT * FROM books WHERE user_id = $1", [
       userId,
@@ -76,7 +74,7 @@ app.post("/register", async (req, res) => {
             "INSERT INTO users (email, password) VALUES ($1, $2)",
             [email, hash]
           );
-          console.log(result);
+          console.log(result.rows);
           res.render("home.ejs");
         }
       });
