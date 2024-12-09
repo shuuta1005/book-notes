@@ -1,0 +1,26 @@
+<%- include('partials/header') %>
+
+<div class="container my-5">
+  <div class="p-5 text-center bg-body-tertiary rounded-3">
+    <h1 class="text-body-emphasis title-text">Book List App ✎</h1>
+    <p class="col-lg-8 mx-auto fs-5 text-muted sub-text">
+      This is a book note app where you can keep record of books that you've
+      read. Login to view a list of books that you've read. Register to make an
+      account and start keeping a record of books.
+    </p>
+    <div class="d-inline-flex gap-2 mb-5">
+      <a class="btn btn-dark btn-lg btn-login" href="/login" role="button"
+        >Login</a
+      >
+
+      <a
+        class="btn btn-outline-secondary btn-lg px-4 btn-register"
+        href="/register"
+      >
+        Register
+      </a>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

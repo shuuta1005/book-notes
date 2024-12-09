@@ -1,0 +1,44 @@
+/*General Styling*/
+
+body {
+  background-color: darkslategray;
+  height: 80%;
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center;
+}
+
+html {
+  height: 100%;
+}
+
+.centered {
+  padding-top: 200px;
+  text-align: center;
+}
+
+.sub-text {
+  color: lightgrey !important;
+}
+
+/*HOME PAGE STYLES*/
+
+/*Home page button styles*/
+.btn-register {
+  background-color: darkgray;
+  color: lightyellow;
+}
+
+.btn-login {
+  background-color: lightcoral;
+  border-color: lightcoral;
+}
+
+.btn-login:hover {
+  background-color: coral;
+  border-color: lightcoral;
+}
+
+.title-text {
+  color: lightyellow;
+}
