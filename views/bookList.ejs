@@ -1,0 +1,17 @@
+<%- include('partials/header') %>
+<div class="container">
+  <h1>Book List 📖</h1>
+
+  <!-- Add new book button, replaced link with a button -->
+  <a href="/add" class="btn-add-book">Add a New Book</a>
+
+  <h2>Books I've read 📚</h2>
+  <ul>
+    <% books.forEach(book => { %>
+    <li>
+      <a href="/books/<%= book.id %>"><%= book.title %></a>
+    </li>
+    <% }) %>
+  </ul>
+</div>
+<%- include('partials/header') %>
