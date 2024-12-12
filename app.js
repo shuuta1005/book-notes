@@ -1,3 +1,11 @@
+//TO DO
+// 1. Make sure that users go to their own page (!DONE)
+// 2. Make Add-book buttons work
+// 3. Allow users add books
+// 4. Check the login system (!DONE)
+// 5. Add logout function
+// 6. Check the database structure !!!!!IMPORTANT
+
 import express from "express";
 import bodyParser from "body-parser";
 import pg from "pg";
@@ -49,20 +57,33 @@ app.get("/register", (req, res) => {
   res.render("register.ejs");
 });
 //Define book list route
-app.get("/books", (req, res) => {
-  console.log(req.user);
+app.get("/books", async (req, res) => {
   if (req.isAuthenticated()) {
-    res.render("bookList.ejs");
+    const { id, email } = req.user;
+    try {
+      const result = await db.query("SELECT * FROM books WHERE user_id = $1", [
+        id,
+      ]);
+      const books = result.rows;
+      res.render("bookList.ejs", { email, books });
+    } catch (err) {
+      console.error("Error fetching books:", err);
+      res.status(500).send("Internal Server Error");
+    }
   } else {
     res.redirect("/login");
   }
+});
+// Route to display the form for adding a new book
+app.get("/add", (req, res) => {
+  res.render("add-book"); // Render the add-book.ejs file
 });
 
 //Post Routes -------------------------------------------------------------------
 
 //Define register post
 app.post("/register", async (req, res) => {
-  const email = req.body.username;
+  const email = req.body.email;
   const password = req.body.password;
 
   try {
@@ -85,7 +106,7 @@ app.post("/register", async (req, res) => {
           );
           const user = result.rows[0];
           req.login(user, (err) => {
-            console.log(user.username + " registered successfully.");
+            console.log(user.email + " registered successfully.");
             res.redirect("/books");
           });
         }
@@ -107,45 +128,55 @@ app.post(
 
 //Define local Strategy -------------------------------------------------------------------
 passport.use(
-  new Strategy(async function verify(username, password, cb) {
-    try {
-      const result = await db.query(
-        "SELECT password from users WHERE email = $1",
-        [username]
-      );
+  new Strategy(
+    {
+      usernameField: "email", // Specify that 'email' is the username field
+      passwordField: "password", // Optionally specify the password field (default is 'password')
+    },
+    async function verify(email, password, cb) {
+      try {
+        const result = await db.query(
+          "SELECT email, password FROM users WHERE email = $1",
+          [email]
+        );
 
-      if (result.rows.length > 0) {
-        const user = result.rows[0];
-        const storedHashedPassword = user.password;
+        if (result.rows.length > 0) {
+          const user = result.rows[0];
+          const isValid = await bcrypt.compare(password, user.password);
 
-        bcrypt.compare(password, storedHashedPassword, (err, valid) => {
-          if (err) {
-            res.send("Error compareing password", err);
-            return cb(err);
+          if (isValid) {
+            return cb(null, { email: user.email });
           } else {
-            if (valid) {
-              return cb(null, user);
-            } else {
-              return cb(null, false);
-            }
+            return cb(null, false, { message: "Incorrect password." });
           }
-        });
-      } else {
-        res.send("User not found with the email");
+        } else {
+          return cb(null, false, { message: "User not found." });
+        }
+      } catch (err) {
+        return cb(err);
       }
-    } catch (err) {
-      console.log(err);
     }
-  })
+  )
 );
 
 //Passport serializeUser
 passport.serializeUser((user, cb) => {
-  cb(null, user);
+  cb(null, user.email);
 });
 //Passport deserializeUser
-passport.deserializeUser((user, cb) => {
-  cb(null, user);
+passport.deserializeUser(async (email, cb) => {
+  try {
+    const result = await db.query("SELECT email FROM users WHERE email = $1", [
+      email,
+    ]);
+    if (result.rows.length > 0) {
+      cb(null, result.rows[0]);
+    } else {
+      cb(null, false);
+    }
+  } catch (err) {
+    cb(err);
+  }
 });
 
 //App listens
