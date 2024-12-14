@@ -3,8 +3,10 @@
 // 2. Make Add-book buttons work (!DONE)
 // 3. Allow users add books (!DONE)
 // 4. Check the login system (!DONE)
-// 5. Add logout function
+// 5. Add logout function (!DONE)
 // 6. Check the database structure (!DONE)
+// 7. Update frontend
+//8. Add google authentication (!DONE)
 
 import express from "express";
 import bodyParser from "body-parser";
@@ -13,6 +15,7 @@ import bcrypt from "bcrypt";
 import passport from "passport";
 import session from "express-session";
 import { Strategy } from "passport-local";
+import GoogleStrategy from "passport-google-oauth2";
 import env from "dotenv";
 
 const app = express();
@@ -88,6 +91,28 @@ app.get("/add", (req, res) => {
   } else {
     res.redirect("/login");
   }
+});
+//Define
+app.get(
+  "/auth/google",
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+  })
+);
+//Deinfe
+app.get(
+  "/auth/google/books",
+  passport.authenticate("google", {
+    successRedirect: "/books",
+    failureRedirect: "/login",
+  })
+);
+//Define logout
+app.get("/logout", (req, res) => {
+  req.logout((err) => {
+    if (err) console.log(err);
+    res.redirect("/");
+  });
 });
 
 //Post Routes -------------------------------------------------------------------
@@ -176,6 +201,7 @@ app.post("/add", async (req, res) => {
 
 //Define local Strategy -------------------------------------------------------------------
 passport.use(
+  "local",
   new Strategy(
     {
       usernameField: "email", // Specify that 'email' is the username field
@@ -204,6 +230,38 @@ passport.use(
         }
       } catch (err) {
         return cb(err);
+      }
+    }
+  )
+);
+
+passport.use(
+  "google",
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: "http://localhost:3000/auth/google/books",
+      userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
+    },
+    async (accessToken, refreshToken, profile, cb) => {
+      console.log(profile);
+      try {
+        const result = await db.query("SELECT * FROM users WHERE email = $1", [
+          profile.email,
+        ]);
+        if (result.rows.length === 0) {
+          const newUser = await db.query(
+            "INSERT INTO users (email, password) VALUES ($1, $2)",
+            [profile.email, "google"]
+          );
+          cb(null, newUser.rows[0]);
+        } else {
+          //Already existing user
+          cb(null, result.rows[0]);
+        }
+      } catch (err) {
+        cb(err);
       }
     }
   )
