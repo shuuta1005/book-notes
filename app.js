@@ -17,15 +17,23 @@ import session from "express-session";
 import { Strategy } from "passport-local";
 import GoogleStrategy from "passport-google-oauth2";
 import env from "dotenv";
+import methodOverride from "method-override";
 
 const app = express();
 const port = 3000;
 const saltRounds = 5;
 env.config();
 
+// Configure the view engine as EJS
+app.set("view engine", "ejs");
+
+// Set the views directory (if it's not in the default './views')
+app.set("views", "./views");
+
 //Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
+app.use(methodOverride("_method"));
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -113,6 +121,34 @@ app.get("/logout", (req, res) => {
     if (err) console.log(err);
     res.redirect("/");
   });
+});
+
+//Define
+app.get("/books/:id", async (req, res) => {
+  try {
+    console.log("View engine is:", app.get("view engine"));
+    console.log("Views directory is:", app.get("views"));
+
+    const bookId = req.params.id;
+    console.log("Requested book ID:", bookId);
+
+    const result = await db.query("SELECT * FROM books WHERE id = $1", [
+      bookId,
+    ]);
+
+    if (result.rows.length > 0) {
+      const book = result.rows[0];
+      console.log("Book details:", book);
+
+      res.render("book-info", { book });
+    } else {
+      console.error("Book not found");
+      res.status(404).send("Book not found");
+    }
+  } catch (err) {
+    console.error("Error fetching book details:", err);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
 //Post Routes -------------------------------------------------------------------
