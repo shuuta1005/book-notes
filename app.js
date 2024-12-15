@@ -7,6 +7,8 @@
 // 6. Check the database structure (!DONE)
 // 7. Update frontend
 //8. Add google authentication (!DONE)
+//9. Add delete book function
+//10. Add edit book function
 
 import express from "express";
 import bodyParser from "body-parser";
@@ -123,7 +125,7 @@ app.get("/logout", (req, res) => {
   });
 });
 
-//Define
+//Show book detail
 app.get("/books/:id", async (req, res) => {
   try {
     console.log("View engine is:", app.get("view engine"));
@@ -148,6 +150,17 @@ app.get("/books/:id", async (req, res) => {
   } catch (err) {
     console.error("Error fetching book details:", err);
     res.status(500).send("Internal Server Error");
+  }
+});
+
+// Show edit form
+app.get("/books/:id/edit", async (req, res) => {
+  try {
+    const book = await Book.findById(req.params.id); // Fetch book by ID
+    res.render("edit-book", { book });
+  } catch (error) {
+    console.error("Error fetching book:", error);
+    res.status(500).send("Error fetching book for editing.");
   }
 });
 
@@ -235,7 +248,32 @@ app.post("/add", async (req, res) => {
   }
 });
 
-//Define local Strategy -------------------------------------------------------------------
+//PUT ROUTE -------------------------------------------------------------------
+// Update book
+app.put("/books/:id", async (req, res) => {
+  try {
+    const { title, author } = req.body;
+    await Book.findByIdAndUpdate(req.params.id, { title, author });
+    res.redirect("/books"); // Redirect to the book list
+  } catch (error) {
+    console.error("Error updating book:", error);
+    res.status(500).send("Error updating book.");
+  }
+});
+
+//DELETE ROUTE -------------------------------------------------------------------
+// Delete book
+app.delete("/books/:id", async (req, res) => {
+  try {
+    await Book.findByIdAndDelete(req.params.id); // Delete book by ID
+    res.redirect("/books"); // Redirect to the book list
+  } catch (error) {
+    console.error("Error deleting book:", error);
+    res.status(500).send("Error deleting book.");
+  }
+});
+
+c; //Define local Strategy -------------------------------------------------------------------
 passport.use(
   "local",
   new Strategy(
