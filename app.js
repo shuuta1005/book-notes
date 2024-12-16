@@ -5,10 +5,11 @@
 // 4. Check the login system (!DONE)
 // 5. Add logout function (!DONE)
 // 6. Check the database structure (!DONE)
-// 7. Update frontend
+// 7. Update frontend (!DONE)
 //8. Add google authentication (!DONE)
-//9. Add delete book function
-//10. Add edit book function
+//9. Add delete book function (!DONE)
+//10. Add edit book function (!DONE)
+//11. Debugging and code reviews
 
 import express from "express";
 import bodyParser from "body-parser";
