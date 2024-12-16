@@ -1,27 +1,75 @@
 <%- include('partials/header') %>
 
-<div class="container">
-  <h1>Add a New Book</h1>
-  <form action="/add" method="POST">
-    <label for="title">Title:</label>
-    <input type="text" id="title" name="title" required />
+<div
+  class="container my-5 main-text"
+  style="min-height: 100vh; padding-top: 150px"
+>
+  <div class="text-center mb-4">
+    <h1 class="fw-bold">Add a New Book</h1>
+    <p class="text-muted fs-5 supporting-text">
+      Fill in the details below to add a book to your list.
+    </p>
+  </div>
 
-    <label for="author">Author:</label>
-    <input type="text" id="author" name="author" required />
+  <form action="/add" method="POST" class="mx-auto" style="max-width: 600px">
+    <div class="mb-3">
+      <label for="title" class="form-label">Title:</label>
+      <input
+        type="text"
+        id="title"
+        name="title"
+        class="form-control"
+        required
+      />
+    </div>
 
-    <label for="isbn">ISBN:</label>
-    <input type="text" id="isbn" name="isbn" />
+    <div class="mb-3">
+      <label for="author" class="form-label">Author:</label>
+      <input
+        type="text"
+        id="author"
+        name="author"
+        class="form-control"
+        required
+      />
+    </div>
 
-    <label for="rating">Rating (0-10):</label>
-    <input type="number" id="rating" name="rating" min="0" max="10" />
+    <div class="mb-3">
+      <label for="isbn" class="form-label">ISBN:</label>
+      <input type="text" id="isbn" name="isbn" class="form-control" />
+    </div>
 
-    <label for="notes">Notes:</label>
-    <textarea id="notes" name="notes"></textarea>
+    <div class="mb-3">
+      <label for="rating" class="form-label">Rating (0-10):</label>
+      <input
+        type="number"
+        id="rating"
+        name="rating"
+        class="form-control"
+        min="0"
+        max="10"
+      />
+    </div>
 
-    <label for="date_read">Date Read:</label>
-    <input type="date" id="date_read" name="date_read" />
+    <div class="mb-3">
+      <label for="notes" class="form-label">Notes:</label>
+      <textarea
+        id="notes"
+        name="notes"
+        class="form-control"
+        rows="4"
+      ></textarea>
+    </div>
 
-    <button type="submit">Add Book</button>
+    <div class="mb-3">
+      <label for="date_read" class="form-label">Date Read:</label>
+      <input type="date" id="date_read" name="date_read" class="form-control" />
+    </div>
+
+    <div class="text-center mt-4">
+      <button type="submit" class="btn btn-primary btn-lg">Add Book</button>
+      <a href="/" class="btn btn-secondary btn-lg ms-2">Cancel</a>
+    </div>
   </form>
 </div>
 

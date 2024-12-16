@@ -1,40 +1,45 @@
 <%- include('partials/header') %>
-<div class="container book-details">
-  <div class="book-image">
-    <!-- Display book cover using Open Library API, with fallback if not found -->
-    <img
-      src="https://covers.openlibrary.org/b/isbn/<%= book.isbn %>-M.jpg?default=false"
-      alt="<%= book.title %> cover"
-      onerror="this.onerror=null; this.src='/images/default-cover.jpg';"
-    />
-  </div>
-  <div class="book-info">
-    <h1><%= book.title %></h1>
-    <h2>by <%= book.author %></h2>
 
-    <p><strong>ISBN:</strong> <%= book.isbn %></p>
-    <p>
-      <strong>Date Read:</strong> <%= book.date_read ?
-      book.date_read.toDateString() : 'N/A' %>
-    </p>
-    <p><strong>Rating:</strong> <%= book.rating %> / 10</p>
-    <p><strong>Notes:</strong> <%= book.notes %></p>
+<div class="container my-5">
+  <div class="row">
+    <div class="col-md-4 text-center">
+      <!-- Book Cover -->
+      <img
+        src="https://covers.openlibrary.org/b/isbn/<%= book.isbn %>-M.jpg?default=false"
+        alt="<%= book.title %> cover"
+        class="img-fluid rounded shadow"
+        onerror="this.onerror=null; this.src='/images/default-cover.jpg';"
+      />
+    </div>
+    <div class="col-md-8">
+      <h1 class="fw-bold main-text"><%= book.title %></h1>
+      <h3 class="text-muted sub-text">by <%= book.author %></h3>
 
-    <div class="button-group">
-      <!-- Edit Button -->
-      <a href="/books/<%= book.id %>/edit" class="btn-edit">Edit</a>
+      <ul class="list-unstyled mt-4 main-text">
+        <li><strong>ISBN:</strong> <%= book.isbn || 'N/A' %></li>
+        <li>
+          <strong>Date Read:</strong> <%= book.date_read ?
+          book.date_read.toDateString() : 'N/A' %>
+        </li>
+        <li><strong>Rating:</strong> <%= book.rating || 'Not Rated' %> / 10</li>
+        <li><strong>Notes:</strong> <%= book.notes || 'None' %></li>
+      </ul>
 
-      <!-- Delete Button -->
-      <form action="/books/<%= book.id %>?_method=DELETE" method="POST">
-        <button type="submit" class="btn-delete">Delete</button>
-      </form>
-
-      <!-- Back to Book List -->
-      <a href="/" class="btn-back">Back to Book List</a>
+      <div class="mt-4">
+        <a href="/books/<%= book.id %>/edit" class="btn btn-info btn-lg me-2"
+          >Edit</a
+        >
+        <form
+          action="/books/<%= book.id %>?_method=DELETE"
+          method="POST"
+          class="d-inline"
+        >
+          <button type="submit" class="btn btn-danger btn-lg">Delete</button>
+        </form>
+        <a href="/" class="btn btn-secondary btn-lg ms-2">Back to Book List</a>
+      </div>
     </div>
   </div>
 </div>
 
-</body>
-</html>
-
+<%- include('partials/footer') %>

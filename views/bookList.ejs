@@ -1,24 +1,49 @@
 <%- include('partials/header') %>
-<div class="container">
-  <h2>Your Book List:</h2>
-  <!-- Add new book button -->
-  <a href="/add" class="btn-add-book">Add a New Book</a>
+<div class="container my-5">
+  <!-- Welcome Message -->
+  <div class="text-center mb-4">
+    <h1 class="fw-bold main-text">Welcome, <%= email %>!</h1>
+    <h2 class="text-muted sub-text">Your Personal Book List 📚</h2>
+  </div>
 
-  <h1>Hello <%= email %>!</h1>
+  <!-- Add New Book Button -->
+  <div class="d-flex justify-content-center mb-4">
+    <a href="/add" class="btn btn-primary btn-lg">+ Add a New Book</a>
+  </div>
 
-  <h2>Books I've Read 📚</h2>
+  <!-- Book List -->
   <% if (books.length > 0) { %>
-  <ul>
+  <div class="list-group mb-5">
     <% books.forEach(book => { %>
-    <li>
-      <strong><%= book.title %></strong> by <%= book.author %>
-      <a href="/books/<%= book.id %>">View Details</a>
-    </li>
+    <div class="list-group-item p-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h4 class="mb-1 fw-bold"><%= book.title %></h4>
+          <p class="mb-0 text-muted">by <%= book.author %></p>
+        </div>
+        <div>
+          <a
+            href="/books/<%= book.id %>"
+            class="btn btn-outline-info btn-sm me-2"
+            >View Details</a
+          >
+        </div>
+      </div>
+    </div>
     <% }) %>
-  </ul>
+  </div>
   <% } else { %>
-  <p>You haven’t added any books yet. Click the button above to get started!</p>
+  <div class="text-center">
+    <p class="fs-5">
+      You haven’t added any books yet. Click the button above to get started!
+    </p>
+  </div>
   <% } %>
+
+  <!-- Logout Button -->
+  <div class="text-center">
+    <a class="btn btn-secondary btn-lg" href="/logout" role="button">Log Out</a>
+  </div>
 </div>
-<a class="btn btn-light btn-lg" href="/logout" role="button">Log Out</a>
+
 <%- include('partials/footer') %>
