@@ -156,8 +156,17 @@ app.get("/books/:id", async (req, res) => {
 // Show edit form
 app.get("/books/:id/edit", async (req, res) => {
   try {
-    const book = await Book.findById(req.params.id); // Fetch book by ID
-    res.render("edit-book", { book });
+    const bookId = req.params.id;
+    const result = await db.query("SELECT * FROM books WHERE id = $1", [
+      bookId,
+    ]);
+    const book = result.rows[0];
+
+    if (book) {
+      res.render("edit-book", { book });
+    } else {
+      res.status(404).send("Book not found");
+    }
   } catch (error) {
     console.error("Error fetching book:", error);
     res.status(500).send("Error fetching book for editing.");
@@ -249,12 +258,18 @@ app.post("/add", async (req, res) => {
 });
 
 //PUT ROUTE -------------------------------------------------------------------
-// Update book
+// PUT route to update a book
 app.put("/books/:id", async (req, res) => {
   try {
-    const { title, author } = req.body;
-    await Book.findByIdAndUpdate(req.params.id, { title, author });
-    res.redirect("/books"); // Redirect to the book list
+    const { id } = req.params;
+    const { title, author, isbn, rating, notes, date_read } = req.body;
+
+    await db.query(
+      "UPDATE books SET title = $1, author = $2, isbn = $3, rating = $4, notes = $5, date_read = $6 WHERE id = $7",
+      [title, author, isbn, rating, notes, date_read, id]
+    );
+
+    res.redirect("/books");
   } catch (error) {
     console.error("Error updating book:", error);
     res.status(500).send("Error updating book.");
@@ -265,7 +280,11 @@ app.put("/books/:id", async (req, res) => {
 // Delete book
 app.delete("/books/:id", async (req, res) => {
   try {
-    await Book.findByIdAndDelete(req.params.id); // Delete book by ID
+    const bookId = req.params.id;
+
+    // Use SQL to delete the book by its ID
+    await db.query("DELETE FROM books WHERE id = $1", [bookId]);
+
     res.redirect("/books"); // Redirect to the book list
   } catch (error) {
     console.error("Error deleting book:", error);
@@ -273,7 +292,7 @@ app.delete("/books/:id", async (req, res) => {
   }
 });
 
-c; //Define local Strategy -------------------------------------------------------------------
+//Define local Strategy -------------------------------------------------------------------
 passport.use(
   "local",
   new Strategy(
