@@ -64,7 +64,7 @@ const db = new pg.Client({
 
 db.connect();
 
-//Get Routes -------------------------------------------------------------------
+//Get Routes ------------------------------------------------------------------
 //Define home page route
 app.get("/", (req, res) => {
   res.render("home.ejs");
